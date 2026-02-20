@@ -633,7 +633,17 @@
     }
 
 
+    .back-btn {
+  display: inline-block;
+  margin: 15px 0;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+}
 
+.back-btn:hover {
+  text-decoration: underline;
+}
 
 
     /* FOOTER */
@@ -643,6 +653,27 @@
       padding: 30px;
       text-align: center;
       margin-top: 40px
+    }
+
+    .footer-links {
+      margin-bottom: 10px;
+    }
+
+    .footer-links a {
+      color: #ccc;
+      margin: 0 10px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .footer-links a {
+      display: inline-block;
+      padding: 5px;
     }
 
     /* MOBILE */
@@ -732,6 +763,7 @@
 
       <button onclick="randomDetails()">Fill Random</button>
       <button onclick="nextStep(2)">Continue</button>
+      <a href="index.html" class="back-btn">← Back</a>
     </div>
 
 
@@ -745,6 +777,7 @@
       </div>
 
       <button onclick="startPayment()">Pay Securely</button>
+      <a href="index.html" class="back-btn">← Back</a>
     </div>
 
 
@@ -802,6 +835,37 @@
 
 
   <footer class="footer">
+    <div class="footer-links">
+      <a href="refund.html">Refund Policy</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms & Conditions</a>
+
+      <p>
+
+        Thank you for shopping with Metro Cloth Enterprise.
+
+        We accept returns only in the following cases:
+
+        • The product received is damaged
+        • The product received is incorrect
+
+        To request a return, please contact us within **3 days of delivery** with your order ID and product photo.
+
+        After verification, we will provide either:
+        • Replacement product, OR
+        • Refund to original payment method within 5–7 working days
+
+        We do not accept returns for:
+        • Size issues
+        • Change of mind
+        • Used or washed products
+
+        For support, contact us at:
+        📧 [joypaul727856@gmail.com](mailto:joypaul727856@gmail.com)
+
+        Metro Cloth Enterprise reserves the right to approve or reject return requests after inspection.
+        © 2026 Your Brand Name</p>
+    </div>
     <div class="footer-container">
 
       <div class="footer-col">
@@ -1269,3 +1333,4 @@ font-family:Arial;
 
 
 </html>
+
