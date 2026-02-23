@@ -5,6 +5,7 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const cors = require("cors");
 const path = require("path");
+const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -43,30 +44,50 @@ app.post("/create-order", async (req, res) => {
 // =======================
 // VERIFY PAYMENT
 // =======================
-app.post("/verify-payment", (req, res) => {
-  try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    } = req.body;
+app.post("/verify-payment", async (req, res) => {
+  const {
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+    email,
+    name,
+    amount
+  } = req.body;
 
-    const generated = crypto
-      .createHmac("sha256", process.env.KEY_SECRET)
-      .update(razorpay_order_id + "|" + razorpay_payment_id)
-      .digest("hex");
+  const generated = crypto
+    .createHmac("sha256", process.env.KEY_SECRET)
+    .update(razorpay_order_id + "|" + razorpay_payment_id)
+    .digest("hex");
 
-    if (generated === razorpay_signature) {
-      console.log("✅ Payment verified");
-      res.json({ success: true });
-    } else {
-      console.log("❌ Signature mismatch");
-      res.json({ success: false });
-    }
-  } catch (err) {
-    console.log("VERIFY ERROR:", err);
+  if (generated === razorpay_signature) {
+
+    // 📩 Send email to owner
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: "🛒 New Order Received",
+      html: `
+        <h2>New Payment Received</h2>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Amount:</b> ₹${amount/100}</p>
+        <p><b>Payment ID:</b> ${razorpay_payment_id}</p>
+      `,
+    });
+
+    res.json({ success: true });
+
+  } else {
     res.json({ success: false });
   }
+});
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 
@@ -83,3 +104,4 @@ app.get("/", (req, res) => {
 // =======================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log("Server running on port", PORT));
+
