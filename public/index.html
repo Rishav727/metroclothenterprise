@@ -634,23 +634,23 @@
 
 
     .back-btn {
-  display: inline-block;
-  margin: 15px 0;
-  color: #333;
-  text-decoration: none;
-  font-size: 14px;
-}
+      display: inline-block;
+      margin: 15px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+    }
 
-.back-btn:hover {
-  text-decoration: underline;
-}
+    .back-btn:hover {
+      text-decoration: underline;
+    }
 
 
     /* FOOTER */
     footer {
       background: #4b2e1e;
       color: white;
-      padding: 30px;
+      padding: 30px 10px;
       text-align: center;
       margin-top: 40px
     }
@@ -758,12 +758,14 @@
       <h2>Step 1: Personal Details</h2>
 
       <input id="name" placeholder="Full Name">
+      <input id="email" placeholder="Email Address">
       <input id="phone" placeholder="Phone Number">
       <input id="address" placeholder="Address">
 
+      <a href="index.html" class="back-btn">← Back</a>
+
       <button onclick="randomDetails()">Fill Random</button>
       <button onclick="nextStep(2)">Continue</button>
-      <a href="index.html" class="back-btn">← Back</a>
     </div>
 
 
@@ -776,8 +778,9 @@
         <div class="loader"></div>
       </div>
 
-      <button onclick="startPayment()">Pay Securely</button>
       <a href="index.html" class="back-btn">← Back</a>
+
+      <button onclick="startPayment()">Pay Securely</button>
     </div>
 
 
@@ -835,6 +838,7 @@
 
 
   <footer class="footer">
+
     <div class="footer-links">
       <a href="refund.html">Refund Policy</a>
       <a href="privacy.html">Privacy Policy</a>
@@ -866,6 +870,7 @@
         Metro Cloth Enterprise reserves the right to approve or reject return requests after inspection.
         © 2026 Your Brand Name</p>
     </div>
+
     <div class="footer-container">
 
       <div class="footer-col">
@@ -1137,92 +1142,99 @@ Thank you for shopping with us.
 
     async function startPayment() {
 
-  // calculate real cart total
-  const total = cart.reduce((a, b) => a + b.price, 0);
+      // calculate real cart total
+      const total = cart.reduce((a, b) => a + b.price, 0);
 
-  if (total === 0) {
-    alert("Cart is empty");
-    return;
-  }
+      if (total === 0) {
+        alert("Cart is empty");
+        return;
+      }
 
-  // create order on backend
-  const res = await fetch("https://metroclothenterprise-1.onrender.com/create-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount: total * 100 }) // amount in paise
-  });
-
-  const order = await res.json();
-
-  // Razorpay options
-  const options = {
-    key: "rzp_test_SHizeiyDe57AM0",
-    amount: order.amount,
-    currency: "INR",
-    name: "Metro Cloth Enterprise",
-    description: "Secure Payment",
-    order_id: order.id,
-
-    handler: async function (response) {
-      console.log("PAYMENT RESPONSE:", response);
-
-      // verify payment on backend
-      const verify = await fetch("https://metroclothenterprise-1.onrender.com/verify-payment", { 
+      // create order on backend
+      const res = await fetch("https://metroclothenterprise-1.onrender.com/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_signature: response.razorpay_signature
-        })
+        body: JSON.stringify({ amount: total * 100 }) // amount in paise
       });
 
-      const result = await verify.json();
+      const order = await res.json();
 
-      if (result.success) {
-        // ✅ show success box
-        document.getElementById("success-box").style.display = "block";
+      // Razorpay options
+      const options = {
+        key: "rzp_test_SHizeiyDe57AM0",
+        amount: order.amount,
+        currency: "INR",
+        name: "Metro Cloth Enterprise",
+        description: "Secure Payment",
+        order_id: order.id,
 
-        document.getElementById("payid").innerText =
-          response.razorpay_payment_id;
+        handler: async function (response) {
+          console.log("PAYMENT RESPONSE:", response);
 
-        document.getElementById("paydate").innerText =
-          new Date().toLocaleString();
+          // verify payment on backend
+          const customerName = document.getElementById("name").value;
+          const customerEmail = document.getElementById("email").value;
+          const total = cart.reduce((a, b) => a + b.price, 0);
 
-        generateOrder();
+          const verify = await fetch("https://metroclothenterprise-1.onrender.com/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              name: customerName,
+              email: customerEmail,
+              amount: total
+            })
+          });
 
-        // ✅ store cart for invoice before clearing
-        lastOrderCart = [...cart];
+          const result = await verify.json();
 
-        // ✅ optionally auto-download invoice
-        // downloadInvoice();
+          if (result.success) {
+            // ✅ show success box
+            document.getElementById("success-box").style.display = "block";
 
-        // ✅ clear current cart
-        cart = [];
-        render();
-      } else {
-        alert("Payment verification failed");
-      }
+            document.getElementById("payid").innerText =
+              response.razorpay_payment_id;
+
+            document.getElementById("paydate").innerText =
+              new Date().toLocaleString();
+
+            generateOrder();
+
+            // ✅ store cart for invoice before clearing
+            lastOrderCart = [...cart];
+
+            // ✅ optionally auto-download invoice
+            // downloadInvoice();
+
+            // ✅ clear current cart
+            cart = [];
+            render();
+          } else {
+            alert("Payment verification failed");
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
     }
-  };
-
-  const rzp = new Razorpay(options);
-  rzp.open();
-}
 
 
     function downloadInvoice() {
 
-  const itemsHTML = lastOrderCart.map(i =>
-    `<tr>
+      const itemsHTML = lastOrderCart.map(i =>
+        `<tr>
        <td>${i.name}</td>
        <td>₹${i.price}</td>
      </tr>`
-  ).join("");
+      ).join("");
 
-  const total = lastOrderCart.reduce((a, b) => a + b.price, 0);
+      const total = lastOrderCart.reduce((a, b) => a + b.price, 0);
 
-  const html = `
+      const html = `
   <html>
   <head>
     <title>Invoice</title>
@@ -1254,11 +1266,11 @@ Thank you for shopping with us.
   </html>
   `;
 
-  const win = window.open("", "", "width=800,height=700");
-  win.document.write(html);
-  win.document.close();
-  win.print();
-}
+      const win = window.open("", "", "width=800,height=700");
+      win.document.write(html);
+      win.document.close();
+      win.print();
+    }
 
 
 
@@ -1331,6 +1343,4 @@ font-family:Arial;
 
 </body>
 
-
 </html>
-
