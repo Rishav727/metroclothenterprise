@@ -769,18 +769,37 @@
     </div>
 
 
+
+
     <div class="step" id="step2">
       <h2>Secure Payment</h2>
-      <p>Total Amount: ₹<span id="totalPay"></span></p>
+      <p>Total Amount: <strong>₹<span id="totalPay"></span></strong></p>
 
-      <div id="processing" style="display:none;text-align:center;margin-top:20px;">
-        <p>Processing your payment…</p>
-        <div class="loader"></div>
+      <div
+        style="background: #f9f4f0; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-size: 14px;">
+        <p><strong>Option 1: UPI (GPay/PhonePe/Paytm)</strong></p>
+        <p>UPI ID: <span style="color: #4b2e1e; font-weight: bold;">metrocloth@upi</span></p>
+        <button onclick="redirectToUPI()" style="background:#28a745; margin-bottom: 10px;">Open UPI App</button>
+
+        <p><strong>Option 2: Bank Transfer (IMPS)</strong></p>
+        <p>A/C: 123456789012 | IFSC: BARB0XXXXX</p>
+        <p>Name: Metro Cloth Enterprise</p>
       </div>
 
-      <a href="index.html" class="back-btn">← Back</a>
+      <div style="margin-top: 20px;">
+        <label>Enter 12-Digit UTR / Transaction ID:</label>
+        <input type="text" id="utr_input" placeholder="e.g. 4052XXXXXXXX" maxlength="12">
+        <button onclick="submitUTR()">Submit Transaction Details</button>
+      </div>
+      <a href="#" onclick="showStep(1)" class="back-btn">← Back to Details</a>
+    </div>
 
-      <button onclick="startPayment()">Pay Securely</button>
+    <div class="step" id="waitingStep">
+      <div class="loader"></div>
+      <h2>Verifying Payment...</h2>
+      <p>Our team is verifying your UTR: <strong id="displayUTR"></strong></p>
+      <p style="font-size: 13px; color: #666;">This usually takes 2-5 minutes. Please do not refresh this page.</p>
+      <div id="adminStatus" style="margin-top: 20px; font-weight: bold; color: #4b2e1e;">Status: Pending</div>
     </div>
 
 
@@ -1144,7 +1163,7 @@ Thank you for shopping with us.
       a.click();
     }
 
-    
+
 
 
     function downloadInvoice() {
@@ -1197,11 +1216,91 @@ Thank you for shopping with us.
     }
 
 
+    // 1. Redirect to UPI Apps (Mobile Only)
+    function redirectToUPI() {
+      const amount = document.getElementById("totalPay").innerText;
+      const name = "MetroClothEnterprise";
+      const upiId = "metrocloth@upi"; // Replace with your real UPI ID
+      const url = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
+      window.location.href = url;
+    }
+
+    // 2. Submit UTR to Backend
+    async function submitUTR() {
+      const utr = document.getElementById("utr_input").value;
+      const amount = document.getElementById("totalPay").innerText;
+
+      if (utr.length < 10) {
+        alert("Please enter a valid UTR/Transaction ID");
+        return;
+      }
+
+      // Prepare order data
+      const orderData = {
+        utr: utr,
+        amount: amount,
+        customer: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        items: cart
+      };
+
+      try {
+        // Replace with your Render/Node.js backend URL
+        const response = await fetch('https://your-backend-url.com/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData)
+        });
+
+        if (response.ok) {
+          document.getElementById("displayUTR").innerText = utr;
+          showStep('waitingStep');
+          startPolling(utr); // Start checking for admin approval
+        }
+      } catch (err) {
+        alert("Server error. Please try again.");
+      }
+    }
+
+    // 3. Poll Backend for Approval Status
+    function startPolling(utr) {
+      const checkStatus = setInterval(async () => {
+        try {
+          const res = await fetch(`https://your-backend-url.com/api/order-status/${utr}`);
+          const data = await res.json();
+
+          if (data.status === 'approved') {
+            clearInterval(checkStatus);
+            generateOrder(); // Your existing function
+            showStep(3); // Show Success Step
+            startConfetti();
+          } else if (data.status === 'rejected') {
+            clearInterval(checkStatus);
+            document.getElementById("adminStatus").innerText = "Payment Rejected. Please contact support.";
+            document.getElementById("adminStatus").style.color = "red";
+          }
+        } catch (e) {
+          console.log("Polling error...");
+        }
+      }, 5000); // Check every 5 seconds
+    }
+
+    // Helper to switch steps
+    function showStep(n) {
+      document.querySelectorAll(".step").forEach(s => s.style.display = "none");
+      if (typeof n === 'number') {
+        document.getElementById("step" + n).style.display = "block";
+      } else {
+        document.getElementById(n).style.display = "block";
+      }
+    }
+
+
 
   </script>
 
 
-  
+
 
 
 </body>
