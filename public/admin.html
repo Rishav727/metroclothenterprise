@@ -1,0 +1,22 @@
+<h2>Verifying Your Payment...</h2>
+<p>Please wait while admin confirms your payment.</p>
+
+<div id="status">Checking...</div>
+
+<script>
+
+const utr = localStorage.getItem("utr");
+
+setInterval(async ()=>{
+
+  const res = await fetch("/check-status?utr="+utr);
+  const data = await res.json();
+
+  if(data.status==="approved"){
+    document.getElementById("status").innerHTML=
+      "<h2>Payment Approved ✅</h2><p>Your order is confirmed!</p>";
+  }
+
+},4000);
+
+</script>

@@ -104,3 +104,62 @@ app.get("/", (req, res) => {
 // =======================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log("Server running on port", PORT));
+
+
+app.post("/submit-payment", async (req,res)=>{
+
+  const {name,amount,utr} = req.body;
+
+  await db.collection("payments").insertOne({
+    name,
+    amount,
+    utr,
+    status:"pending",
+    created:new Date()
+  });
+
+  res.json({success:true});
+});
+
+
+
+app.post("/submit-payment", async (req,res)=>{
+
+  const {name,amount,utr} = req.body;
+
+  await db.collection("payments").insertOne({
+    name,
+    amount,
+    utr,
+    status:"pending",
+    created:new Date()
+  });
+
+  res.json({success:true});
+});
+
+
+
+app.get("/admin-payments", async (req,res)=>{
+
+  const payments = await db.collection("payments")
+  .find().sort({created:-1}).toArray();
+
+  res.json(payments);
+
+});
+
+
+
+
+
+app.post("/approve-payment", async (req,res)=>{
+
+  await db.collection("payments").updateOne(
+    {utr:req.body.utr},
+    {$set:{status:"approved"}}
+  );
+
+  res.json({success:true});
+
+});
