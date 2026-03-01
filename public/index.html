@@ -1045,11 +1045,6 @@
         cities[Math.floor(Math.random() * cities.length)];
     }
 
-
-    function fakePayment() {
-      setTimeout(() => showStep(3), 1500);
-    }
-
     function closeCheckout() {
 
       // hide success screen
@@ -1149,87 +1144,7 @@ Thank you for shopping with us.
       a.click();
     }
 
-    async function startPayment() {
-
-      // calculate real cart total
-      const total = cart.reduce((a, b) => a + b.price, 0);
-
-      if (total === 0) {
-        alert("Cart is empty");
-        return;
-      }
-
-      // create order on backend
-      const res = await fetch("https://metroclothenterprise-1.onrender.com/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total * 100 }) // amount in paise
-      });
-
-      const order = await res.json();
-
-      // Razorpay options
-      const options = {
-        key: "rzp_test_SHizeiyDe57AM0",
-        amount: order.amount,
-        currency: "INR",
-        name: "Metro Cloth Enterprise",
-        description: "Secure Payment",
-        order_id: order.id,
-
-        handler: async function (response) {
-          console.log("PAYMENT RESPONSE:", response);
-
-          // verify payment on backend
-          const customerName = document.getElementById("name").value;
-          const customerEmail = document.getElementById("email").value;
-          const total = cart.reduce((a, b) => a + b.price, 0);
-
-          const verify = await fetch("https://metroclothenterprise-1.onrender.com/verify-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              name: customerName,
-              email: customerEmail,
-              amount: total
-            })
-          });
-
-          const result = await verify.json();
-
-          if (result.success) {
-            // ✅ show success box
-            document.getElementById("success-box").style.display = "block";
-
-            document.getElementById("payid").innerText =
-              response.razorpay_payment_id;
-
-            document.getElementById("paydate").innerText =
-              new Date().toLocaleString();
-
-            generateOrder();
-
-            // ✅ store cart for invoice before clearing
-            lastOrderCart = [...cart];
-
-            // ✅ optionally auto-download invoice
-            // downloadInvoice();
-
-            // ✅ clear current cart
-            cart = [];
-            render();
-          } else {
-            alert("Payment verification failed");
-          }
-        }
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.open();
-    }
+    
 
 
     function downloadInvoice() {
@@ -1285,69 +1200,8 @@ Thank you for shopping with us.
 
   </script>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <button onclick="startPayment()">Pay Securely</button>
 
-
-  <!-- ✅ PAYMENT SUCCESS + INVOICE BOX -->
-  <div id="success-box" style="
-display:none;
-position:fixed;
-top:0; left:0;
-width:100%;
-height:100%;
-background:white;
-z-index:9999;
-padding:40px;
-overflow:auto;
-font-family:Arial;
-">
-
-    <h2 style="color:green;">✅ Payment Successful</h2>
-    <p>Thank you for shopping with Metro Cloth Enterprise.</p>
-
-    <div id="receipt-box" style="
-  border:1px solid #ddd;
-  padding:20px;
-  margin-top:20px;
-  max-width:500px;
-  background:#fafafa;
-  ">
-
-      <h3>Order Receipt</h3>
-
-      <p><b>Payment ID:</b> <span id="payid"></span></p>
-      <p><b>Date:</b> <span id="paydate"></span></p>
-      <p><b>Order ID:</b> <span id="orderId"></span></p>
-      <p><b>Estimated Delivery:</b> <span id="delivery"></span></p>
-
-    </div>
-
-    <br>
-
-    <button onclick="downloadInvoice()" style="
-  padding:12px 20px;
-  background:#4CAF50;
-  color:white;
-  border:none;
-  cursor:pointer;
-  ">
-      Download Invoice
-    </button>
-
-    <button onclick="closeCheckout()" style="
-  padding:12px 20px;
-  background:#333;
-  color:white;
-  border:none;
-  cursor:pointer;
-  margin-left:10px;
-  ">
-      Continue Shopping
-    </button>
-
-  </div>
-
+  
 
 
 </body>
