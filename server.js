@@ -52,8 +52,8 @@ app.post('/api/orders', (req, res) => {
 
     // --- EMAIL NOTIFICATION LOGIC ---
     const mailOptions = {
-        from: 'YOUR_GMAIL@gmail.com',
-        to: 'YOUR_GMAIL@gmail.com', // Receive alerts at this email
+        from: 'joypaul727856@gmail.com',
+        to: 'joypaul727856@gmail.com', // Receive alerts at this email
         subject: `🚨 New Order: ₹${amount} from ${customer}`,
         html: `
             <div style="font-family: Arial, sans-serif; border: 1px solid #4b2e1e; padding: 20px; border-radius: 10px;">
