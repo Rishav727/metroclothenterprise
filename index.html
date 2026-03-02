@@ -699,11 +699,6 @@
 
 <body>
 
-  <div id="statusBanner" style="display:none; background: #fdf5e6; padding: 10px; text-align: center; border-bottom: 2px solid #4b2e1e;">
-    Your payment (UTR: <span id="bannerUTR"></span>) is being verified. 
-    <button onclick="goToWaitingRoom()">View Progress</button>
-</div>
-
   <div id="overlay" onclick="toggleMenu()"></div>
 
 
@@ -1241,12 +1236,6 @@ Thank you for shopping with us.
         return;
       }
 
-      if (response.ok) {
-    localStorage.setItem("pendingUTR", utr); // Save the UTR locally
-    showStep('waitingStep');
-    startPolling(utr);
-}
-
       // Prepare order data
       const orderData = {
         utr: utr,
@@ -1307,18 +1296,9 @@ Thank you for shopping with us.
       }
     }
 
-    window.onload = function() {
-    const savedUTR = localStorage.getItem("pendingUTR");
-    if (savedUTR) {
-        document.getElementById("statusBanner").style.display = "block";
-        document.getElementById("bannerUTR").innerText = savedUTR;
-        startPolling(savedUTR); // Keep checking in the background
-    }
-}
 
-function goToWaitingRoom() {
-    showStep('waitingStep'); // Take them back to the verification screen
-}
+
+    
 
 
 
