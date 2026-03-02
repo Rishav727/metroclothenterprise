@@ -1,13 +1,26 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // Standard Node module for file paths
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 
-// Temporary storage (In a real app, use MongoDB)
+// 1. SERVE STATIC FILES FROM ROOT
+// This tells the server to allow access to index.html, admin.html, etc.
+app.use(express.static(__dirname)); 
+
+// 2. EXPLICITLY HANDLE THE HOME PAGE
+// This fixes the "Cannot GET /" error
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Temporary storage
 let orders = [];
 
-// 1. Endpoint for User to submit UTR
+// --- Your API Routes ---
+
 app.post('/api/orders', (req, res) => {
     const { utr, amount, customer, phone, items } = req.body;
     const newOrder = { 
@@ -20,7 +33,6 @@ app.post('/api/orders', (req, res) => {
     res.status(200).send({ message: "Order logged" });
 });
 
-// 2. Endpoint for Frontend to check status (Polling)
 app.get('/api/order-status/:utr', (req, res) => {
     const order = orders.find(o => o.utr === req.params.utr);
     if (order) {
@@ -30,12 +42,10 @@ app.get('/api/order-status/:utr', (req, res) => {
     }
 });
 
-// 3. ADMIN PANEL: View all pending payments
 app.get('/api/admin/pending', (req, res) => {
     res.json(orders.filter(o => o.status === 'pending'));
 });
 
-// 4. ADMIN PANEL: Approve a payment
 app.post('/api/admin/approve', (req, res) => {
     const { utr } = req.body;
     const order = orders.find(o => o.utr === utr);
@@ -45,7 +55,7 @@ app.post('/api/admin/approve', (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 10000; // Render prefers 10000 or dynamic ports
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
