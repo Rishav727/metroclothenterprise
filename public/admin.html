@@ -14,7 +14,7 @@
 
     <script>
         async function loadOrders() {
-            const res = await fetch('http://localhost:3000/api/admin/pending');
+            const res = await fetch('https://metroclothenterprise.onrender.com');
             const orders = await res.json();
             const container = document.getElementById('list');
             container.innerHTML = orders.map(o => `
@@ -28,7 +28,7 @@
         }
 
         async function approve(utr) {
-            await fetch('http://localhost:3000/api/admin/approve', {
+            await fetch('https://metroclothenterprise.onrender.com', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ utr })
