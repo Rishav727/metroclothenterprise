@@ -3,59 +3,83 @@ const cors = require('cors');
 const path = require('path'); // Standard Node module for file paths
 const app = express();
 
-app.use(express.json());
-app.use(cors());
+// --- 1. MIDDLEWARE (Must be before routes) ---
+app.use(cors()); // Allows your website to talk to your backend
+app.use(express.json()); // Essential for reading the UTR data you send
 
-// 1. SERVE STATIC FILES FROM ROOT
-// This tells the server to allow access to index.html, admin.html, etc.
-app.use(express.static(__dirname)); 
-
-// 2. EXPLICITLY HANDLE THE HOME PAGE
-// This fixes the "Cannot GET /" error
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// --- 2. LOGGING (Helps you see requests in Render Logs) ---
+app.use((req, res, next) => {
+    console.log(`${req.method} request received at ${req.url}`);
+    next();
 });
 
-// Temporary storage
+// Temporary storage (Resets when server restarts)
 let orders = [];
 
-// --- Your API Routes ---
+// --- 3. API ROUTES (Must be ABOVE static files) ---
 
+// Submit a new UTR
 app.post('/api/orders', (req, res) => {
     const { utr, amount, customer, phone, items } = req.body;
+    
+    if (!utr) {
+        return res.status(400).json({ message: "UTR is missing" });
+    }
+
     const newOrder = { 
-        utr, amount, customer, phone, items, 
+        utr, 
+        amount, 
+        customer, 
+        phone, 
+        items, 
         status: 'pending', 
         id: "MC" + Math.floor(Math.random() * 900000) 
     };
+    
     orders.push(newOrder);
-    console.log("New Payment Received:", utr);
-    res.status(200).send({ message: "Order logged" });
+    console.log("Success: Payment Logged for UTR:", utr);
+    res.status(200).json({ message: "Order logged", orderId: newOrder.id });
 });
 
+// Check payment status
 app.get('/api/order-status/:utr', (req, res) => {
     const order = orders.find(o => o.utr === req.params.utr);
     if (order) {
         res.json({ status: order.status });
     } else {
-        res.status(404).json({ message: "Not found" });
+        res.status(404).json({ message: "UTR not found" });
     }
 });
 
+// Admin: Get all pending orders
 app.get('/api/admin/pending', (req, res) => {
     res.json(orders.filter(o => o.status === 'pending'));
 });
 
+// Admin: Approve a payment
 app.post('/api/admin/approve', (req, res) => {
     const { utr } = req.body;
     const order = orders.find(o => o.utr === utr);
     if (order) {
         order.status = 'approved';
         res.json({ message: "Approved!" });
+    } else {
+        res.status(404).json({ message: "Order not found" });
     }
 });
 
-const PORT = process.env.PORT || 10000;
+// --- 4. STATIC FILES (Must be AFTER API routes) ---
+
+// Serve all files (HTML, CSS, JS) from the root folder
+app.use(express.static(__dirname));
+
+// Handle the main website URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// --- 5. START SERVER ---
+const PORT = process.env.PORT || 10000; // Render dynamic port
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
