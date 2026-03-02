@@ -45,5 +45,7 @@ app.post('/api/admin/approve', (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 10000; // Render prefers 10000 or dynamic ports
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
