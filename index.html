@@ -699,6 +699,11 @@
 
 <body>
 
+  <div id="pendingBanner" style="display:none; background: #4b2e1e; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
+    Checking Payment (UTR: <span id="bannerUTR"></span>)... 
+    <button onclick="showStep('waitingStep')" style="margin-left:10px; cursor:pointer;">View Status</button>
+</div>
+
   <div id="overlay" onclick="toggleMenu()"></div>
 
 
@@ -1298,7 +1303,48 @@ Thank you for shopping with us.
 
 
 
-    
+    // 1. Check for pending orders when the page opens
+window.addEventListener('load', () => {
+    const savedUTR = localStorage.getItem("pendingUTR");
+    if (savedUTR) {
+        activateTracking(savedUTR);
+    }
+});
+
+// 2. Modify your existing submitUTR success block
+async function submitUTR() {
+    // ... your existing fetch code ...
+    if (response.ok) {
+        const utr = document.getElementById("utr_input").value;
+        localStorage.setItem("pendingUTR", utr); // Save locally
+        activateTracking(utr);
+        showStep('waitingStep');
+    }
+}
+
+function activateTracking(utr) {
+    document.getElementById("pendingBanner").style.display = "block";
+    document.getElementById("bannerUTR").innerText = utr;
+    startPolling(utr); // Keep checking in the background
+}
+
+// 3. Update startPolling to clear storage on success
+function startPolling(utr) {
+    const checkStatus = setInterval(async () => {
+        try {
+            const res = await fetch(`https://metroclothenterprise.onrender.com/api/order-status/${utr}`);
+            const data = await res.json();
+
+            if (data.status === 'approved') {
+                clearInterval(checkStatus);
+                localStorage.removeItem("pendingUTR"); // Stop tracking
+                document.getElementById("pendingBanner").style.display = "none";
+                generateOrder(); // Your success function
+                showStep(3); 
+            }
+        } catch (e) { console.log("Verifying..."); }
+    }, 7000); 
+}
 
 
 
