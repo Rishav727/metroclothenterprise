@@ -117,3 +117,22 @@ const PORT = process.env.PORT || 10000; // Render dynamic port
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+app.get('/debug-email', (req, res) => {
+    const testMail = {
+        from: 'joypaul727856@gmail.com',
+        to: 'joypaul727856@gmail.com', // Sending to yourself
+        subject: '🚀 System Check: Metro Cloth Enterprise',
+        text: 'If you see this, your Gmail & Nodemailer are working perfectly!'
+    };
+
+    transporter.sendMail(testMail, (error, info) => {
+        if (error) {
+            console.error("❌ TEST FAILED:", error.message);
+            res.status(500).send("Error: " + error.message);
+        } else {
+            console.log("✅ TEST SUCCESS:", info.response);
+            res.send("Success! Check your inbox (and Spam folder).");
+        }
+    });
+});
