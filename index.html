@@ -557,142 +557,274 @@
     }
 
     .footer {
+
       background: #4c3434;
+
       color: #ddd;
+
       padding: 80px 8% 30px;
+
       margin-top: 80px;
+
     }
+
+
 
     .footer-container {
+
       display: grid;
+
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
       gap: 50px;
+
     }
+
+
 
     .footer-col h2,
+
     .footer-col h3 {
+
       color: #fff;
+
       margin-bottom: 15px;
+
     }
+
+
 
     .footer-tag {
+
       line-height: 1.6;
+
       opacity: 0.8;
+
     }
+
+
 
     .footer-col a {
+
       display: block;
+
       color: #aaa;
+
       text-decoration: none;
+
       margin: 6px 0;
+
       transition: 0.3s;
+
     }
+
+
 
     .footer-col a:hover {
+
       color: #fff;
+
       transform: translateX(4px);
+
     }
+
+
 
     .footer-subscribe {
+
       display: flex;
+
       gap: 8px;
+
       margin-top: 10px;
+
     }
+
+
 
     .footer-subscribe input {
+
       padding: 10px;
+
       border: none;
+
       outline: none;
+
       flex: 1;
+
       border-radius: 4px;
+
     }
+
+
 
     .footer-subscribe button {
+
       padding: 10px 16px;
+
       border: none;
+
       background: #fff;
+
       color: #000;
+
       border-radius: 4px;
+
       cursor: pointer;
+
       font-weight: 600;
+
       transition: 0.3s;
+
     }
+
+
 
     .footer-subscribe button:hover {
+
       background: #d4af37;
+
       color: #4e4b4b;
+
     }
 
+
+
     .footer-bottom {
+
       text-align: center;
+
       margin-top: 50px;
+
       padding-top: 25px;
+
       border-top: 1px solid #222;
+
       font-size: 14px;
+
       opacity: 0.7;
+
     }
+
+
+
 
 
     .back-btn {
+
       display: inline-block;
+
       margin: 15px 0;
+
       color: #333;
+
       text-decoration: none;
+
       font-size: 14px;
+
     }
 
+
+
     .back-btn:hover {
+
       text-decoration: underline;
+
     }
+
+
+
 
 
     /* FOOTER */
+
     footer {
+
       background: #4b2e1e;
+
       color: white;
+
       padding: 30px 10px;
+
       text-align: center;
+
       margin-top: 40px
     }
 
+
+
     .footer-links {
+
       margin-bottom: 10px;
+
     }
 
+
+
     .footer-links a {
+
       color: #ccc;
+
       margin: 0 10px;
+
       text-decoration: none;
+
       font-size: 14px;
+
     }
+
+
 
     .footer-links a:hover {
+
       color: #fff;
+
       text-decoration: underline;
+
     }
+
+
 
     .footer-links a {
+
       display: inline-block;
+
       padding: 5px;
+
     }
 
+
+
     /* MOBILE */
+
     @media(max-width:600px) {
+
       .hero {
+
         height: 45vh
       }
 
+
+
       .products {
+
         grid-template-columns: repeat(2, 1fr)
       }
 
+
+
       header {
+
         flex-wrap: wrap
       }
 
+
+
       .search {
+
         width: 100%
       }
+
     }
   </style>
 </head>
@@ -873,74 +1005,39 @@
 
 
   <footer class="footer">
-
     <div class="footer-container">
 
       <div class="footer-col">
         <h2 class="footer-brand">Metro Cloth Enterprise</h2>
         <p class="footer-tag">
-          Premium fashion store offering curated clothing for men, women, and kids.
+          Premium fashion curated for men, women, and kids.
           Quality fabrics, secure payments, and trusted delivery.
         </p>
       </div>
 
       <div class="footer-col">
-        <h3>Policies</h3>
-        <a href="refund.html">
-          <h1>Refund & Return Policy</h1>
-
-          <p>At Metro Cloth Enterprise, customer satisfaction is important to us.</p>
-
-          <h3>Eligible for Return</h3>
-          <ul>
-            <li>Product received is damaged</li>
-            <li>Product received is incorrect</li>
-          </ul>
-
-          <h3>Return Conditions</h3>
-          <ul>
-            <li>Return request must be raised within 3 days of delivery</li>
-            <li>Customer must provide product photo and order ID</li>
-            <li>Product must be unused and in original packaging</li>
-          </ul>
-
-          <h3>Refund Process</h3>
-          <p>
-            After verification, we will offer either a replacement or refund.
-            Refunds are processed to the original payment method within
-            5–7 working days after approval.
-          </p>
-
-          <h3>Non-Returnable Cases</h3>
-          <ul>
-            <li>Size issues</li>
-            <li>Change of mind</li>
-            <li>Used or washed products</li>
-          </ul>
-
-          <p>
-            For return requests, contact us at:
-            <br>Email: joypaul727856@gmail.com
-          </p>
-        </a>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms & Conditions</a>
-        <a href="shipping.html">Shipping Policy</a>
+        <h3>Customer Support</h3>
+        <ul class="footer-links">
+          <li><a href="refund.html">Refund & Return Policy</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms & Conditions</a></li>
+          <li><a href="shipping.html">Shipping Policy</a></li>
+        </ul>
       </div>
 
       <div class="footer-col">
         <h3>Contact Us</h3>
-        <p>Email: joypaul727856@gmail.com</p>
-        <p>Phone: +91 XXXXX XXXXX</p>
-        <p>Address: Your full business address, City, State, India</p>
+        <p>Email: <a href="mailto:joypaul727856@gmail.com">joypaul727856@gmail.com</a></p>
+        <p>Phone: +91 91234 56789</p>
+        <p>Kolkata, West Bengal, India</p>
       </div>
 
       <div class="footer-col">
-        <h3>About</h3>
+        <h3>Our Promise</h3>
         <p>
-          We accept returns only for damaged or incorrect products.
-          Requests must be raised within 3 days of delivery with proof.
-          Refunds are processed within 5–7 working days after approval.
+          Verified quality on every order.
+          3-day easy return for damaged goods.
+          Secure UPI & Bank transfers.
         </p>
       </div>
 
@@ -949,7 +1046,6 @@
     <div class="footer-bottom">
       <p>© 2026 Metro Cloth Enterprise. All rights reserved.</p>
     </div>
-
   </footer>
 
   <div class="footer-bottom">
