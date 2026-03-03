@@ -14,31 +14,56 @@
 
     <script>
         async function loadOrders() {
-            const res = await fetch('https://metroclothenterprise.onrender.com');
-            const orders = await res.json();
-            const container = document.getElementById('list');
-            container.innerHTML = orders.map(o => `
-                <div class="order-card">
-                    <p><strong>Customer:</strong> ${o.customer} (${o.phone})</p>
-                    <p><strong>Amount:</strong> ₹${o.amount}</p>
-                    <p><strong>UTR:</strong> ${o.utr}</p>
-                    <button onclick="approve('${o.utr}')">Verify & Approve</button>
-                </div>
-            `).join('');
+    try {
+        // Corrected URL: Must point to the 'pending' list
+        const res = await fetch('https://metroclothenterprise.onrender.com/api/admin/pending');
+        
+        if (!res.ok) throw new Error("Failed to fetch orders");
+        
+        const orders = await res.json();
+        const container = document.getElementById('list');
+
+        if (orders.length === 0) {
+            container.innerHTML = "<p>No pending payments at the moment.</p>";
+            return;
         }
 
-        async function approve(utr) {
-            await fetch('https://metroclothenterprise.onrender.com', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ utr })
-            });
-            alert("Payment Approved! User will see success message.");
+        container.innerHTML = orders.map(o => `
+            <div class="order-card">
+                <p><strong>Customer:</strong> ${o.customer} (${o.phone})</p>
+                <p><strong>Amount:</strong> ₹${o.amount}</p>
+                <p><strong>UTR:</strong> <span style="color: blue;">${o.utr}</span></p>
+                <button onclick="approve('${o.utr}')">Verify & Approve</button>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error("Admin Load Error:", err);
+    }
+}
+
+async function approve(utr) {
+    try {
+        // Corrected URL: Must point to the 'approve' route
+        const response = await fetch('https://metroclothenterprise.onrender.com/api/admin/approve', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ utr })
+        });
+
+        if (response.ok) {
+            alert("Payment Approved! The customer's screen will now update to Success.");
             loadOrders();
+        } else {
+            alert("Error approving payment. Check server logs.");
         }
+    } catch (err) {
+        console.error("Approve Error:", err);
+    }
+}
 
-        setInterval(loadOrders, 5000);
-        loadOrders();
+// Refresh the list every 10 seconds to catch new orders
+setInterval(loadOrders, 10000);
+loadOrders();
     </script>
 </body>
 </html>
