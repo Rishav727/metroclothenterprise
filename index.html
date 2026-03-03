@@ -699,10 +699,11 @@
 
 <body>
 
-  <div id="pendingBanner" style="display:none; background: #4b2e1e; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
-    Checking Payment (UTR: <span id="bannerUTR"></span>)... 
+  <div id="pendingBanner"
+    style="display:none; background: #4b2e1e; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
+    Checking Payment (UTR: <span id="bannerUTR"></span>)...
     <button onclick="showStep('waitingStep')" style="margin-left:10px; cursor:pointer;">View Status</button>
-</div>
+  </div>
 
   <div id="overlay" onclick="toggleMenu()"></div>
 
@@ -794,7 +795,7 @@
       <div style="margin-top: 20px;">
         <label>Enter 12-Digit UTR / Transaction ID:</label>
         <input type="text" id="utr_input" placeholder="e.g. 4052XXXXXXXX" maxlength="12">
-        <button onclick="submitUTR()">Submit Transaction Details</button>
+        <button onclick="submitUTR(event)">Submit Transaction Details</button>
       </div>
       <a href="#" onclick="showStep(1)" class="back-btn">← Back to Details</a>
     </div>
@@ -1222,36 +1223,38 @@ Thank you for shopping with us.
     }
 
 
-    // 1. Redirect to UPI Apps (Mobile Only)
+    // --- METRO CLOTH CONSOLIDATED LOGIC ---
+
+    // 1. Redirect to UPI Apps
     function redirectToUPI() {
       const amount = document.getElementById("totalPay").innerText;
       const name = "MetroClothEnterprise";
-      const upiId = "metrocloth@upi"; // Replace with your real UPI ID
+      const upiId = "metrocloth@upi";
       const url = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
       window.location.href = url;
     }
 
-    // 2. Submit UTR to Backend
-    async function submitUTR() {
-      const utr = document.getElementById("utr_input").value;
-      const amount = document.getElementById("totalPay").innerText;
+    // 2. Submit UTR (Fixes the "Refresh" issue and starts Tracking)
+    async function submitUTR(event) {
+      if (event) event.preventDefault(); // CRITICAL: Stops the page from refreshing
 
-      if (utr.length < 10) {
-        alert("Please enter a valid UTR/Transaction ID");
+      const utrValue = document.getElementById("utr_input").value;
+      const amountValue = document.getElementById("totalPay").innerText;
+
+      if (utrValue.length < 10) {
+        alert("Please enter a valid 12-digit UTR Number");
         return;
       }
 
-      // Prepare order data
       const orderData = {
-        utr: utr,
-        amount: amount,
+        utr: utrValue,
+        amount: amountValue,
         customer: document.getElementById("name").value,
         phone: document.getElementById("phone").value,
         items: cart
       };
 
       try {
-        // Replace with your Render/Node.js backend URL
         const response = await fetch('https://metroclothenterprise.onrender.com/api/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1259,39 +1262,66 @@ Thank you for shopping with us.
         });
 
         if (response.ok) {
-          document.getElementById("displayUTR").innerText = utr;
+          localStorage.setItem("pendingUTR", utrValue); // Save for background tracking
+          document.getElementById("displayUTR").innerText = utrValue;
+          activateTracking(utrValue);
           showStep('waitingStep');
-          startPolling(utr); // Start checking for admin approval
+        } else {
+          alert("Submission failed. Please try again.");
         }
       } catch (err) {
-        alert("Server error. Please try again.");
+        alert("Server error. Check your Render logs.");
       }
     }
 
-    // 3. Poll Backend for Approval Status
+    // 3. Background Tracking Logic
+    function activateTracking(utr) {
+      const banner = document.getElementById("pendingBanner");
+      if (banner) {
+        banner.style.display = "block";
+        document.getElementById("bannerUTR").innerText = utr;
+      }
+      startPolling(utr);
+    }
+
     function startPolling(utr) {
-      const checkStatus = setInterval(async () => {
+      if (window.pollingTimer) clearInterval(window.pollingTimer); // Prevent double timers
+
+      window.pollingTimer = setInterval(async () => {
         try {
           const res = await fetch(`https://metroclothenterprise.onrender.com/api/order-status/${utr}`);
           const data = await res.json();
 
           if (data.status === 'approved') {
-            clearInterval(checkStatus);
-            generateOrder(); // Your existing function
-            showStep(3); // Show Success Step
+            clearInterval(window.pollingTimer);
+            localStorage.removeItem("pendingUTR"); // Clear tracking memory
+
+            const banner = document.getElementById("pendingBanner");
+            if (banner) banner.style.display = "none";
+
+            generateOrder();
+            showStep(3);
             startConfetti();
           } else if (data.status === 'rejected') {
-            clearInterval(checkStatus);
-            document.getElementById("adminStatus").innerText = "Payment Rejected. Please contact support.";
-            document.getElementById("adminStatus").style.color = "red";
+            clearInterval(window.pollingTimer);
+            localStorage.removeItem("pendingUTR");
+            alert("Payment rejected. Please contact support.");
           }
         } catch (e) {
-          console.log("Polling error...");
+          console.log("Status check...");
         }
-      }, 5000); // Check every 5 seconds
+      }, 5000); // Checks every 5 seconds
     }
 
-    // Helper to switch steps
+    // 4. Persistence: Auto-track on page load
+    window.addEventListener('load', () => {
+      const savedUTR = localStorage.getItem("pendingUTR");
+      if (savedUTR) {
+        activateTracking(savedUTR);
+      }
+    });
+
+    // 5. Helper to switch UI steps
     function showStep(n) {
       document.querySelectorAll(".step").forEach(s => s.style.display = "none");
       if (typeof n === 'number') {
@@ -1300,51 +1330,6 @@ Thank you for shopping with us.
         document.getElementById(n).style.display = "block";
       }
     }
-
-
-
-    // 1. Check for pending orders when the page opens
-window.addEventListener('load', () => {
-    const savedUTR = localStorage.getItem("pendingUTR");
-    if (savedUTR) {
-        activateTracking(savedUTR);
-    }
-});
-
-// 2. Modify your existing submitUTR success block
-async function submitUTR() {
-    // ... your existing fetch code ...
-    if (response.ok) {
-        const utr = document.getElementById("utr_input").value;
-        localStorage.setItem("pendingUTR", utr); // Save locally
-        activateTracking(utr);
-        showStep('waitingStep');
-    }
-}
-
-function activateTracking(utr) {
-    document.getElementById("pendingBanner").style.display = "block";
-    document.getElementById("bannerUTR").innerText = utr;
-    startPolling(utr); // Keep checking in the background
-}
-
-// 3. Update startPolling to clear storage on success
-function startPolling(utr) {
-    const checkStatus = setInterval(async () => {
-        try {
-            const res = await fetch(`https://metroclothenterprise.onrender.com/api/order-status/${utr}`);
-            const data = await res.json();
-
-            if (data.status === 'approved') {
-                clearInterval(checkStatus);
-                localStorage.removeItem("pendingUTR"); // Stop tracking
-                document.getElementById("pendingBanner").style.display = "none";
-                generateOrder(); // Your success function
-                showStep(3); 
-            }
-        } catch (e) { console.log("Verifying..."); }
-    }, 7000); 
-}
 
 
 
