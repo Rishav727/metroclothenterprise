@@ -91,6 +91,17 @@ app.post('/api/admin/approve', (req, res) => {
     }
 });
 
+app.post('/api/admin/reject', (req, res) => {
+    const { utr } = req.body;
+    const order = orders.find(o => o.utr === utr);
+    if (order) {
+        order.status = 'rejected'; // Polling will catch this
+        res.json({ message: "Order rejected" });
+    } else {
+        res.status(404).json({ message: "Order not found" });
+    }
+});
+
 // --- 4. STATIC FILES (Must be AFTER API routes) ---
 
 // Serve all files (HTML, CSS, JS) from the root folder
