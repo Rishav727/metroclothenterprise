@@ -702,7 +702,7 @@
   <div id="pendingBanner"
     style="display:none; background:#f5f5f5; border-bottom:1px solid #4b2e1e; padding:10px; text-align:center; position:sticky; top:0; z-index:1000;">
     <span>Your payment (UTR: <strong id="bannerUTR"></strong>) is being verified.</span>
-    <button onclick="showStep('waitingStep')"
+    <button onclick="reopenWaitingStatus()"
       style="margin-left:15px; text-decoration:underline; background:none; border:none; color:#4b2e1e; cursor:pointer;">
       Check Status
     </button>
@@ -1295,7 +1295,7 @@ Thank you for shopping with us.
     }
 
     function startPolling(utr) {
-      if (window.pollingTimer) clearInterval(window.pollingTimer); // Prevent double timers
+      if (window.pollingTimer) clearInterval(window.pollingTimer);
 
       window.pollingTimer = setInterval(async () => {
         try {
@@ -1304,23 +1304,33 @@ Thank you for shopping with us.
 
           if (data.status === 'approved') {
             clearInterval(window.pollingTimer);
-            localStorage.removeItem("pendingUTR"); // Clear tracking memory
+            localStorage.removeItem("pendingUTR");
 
+            // 1. Hide the tracking banner from the top
             const banner = document.getElementById("pendingBanner");
             if (banner) banner.style.display = "none";
 
+            // 2. IMPORTANT: Force the checkout box to open so they see the success screen!
+            const box = document.getElementById("checkoutBox");
+            if (box) box.style.display = "block";
+
+            // 3. Show the success UI
             generateOrder();
-            showStep(3);
+            showStep(3); // Success Screen
             startConfetti();
           } else if (data.status === 'rejected') {
             clearInterval(window.pollingTimer);
             localStorage.removeItem("pendingUTR");
+
+            const banner = document.getElementById("pendingBanner");
+            if (banner) banner.style.display = "none";
+
             alert("Payment rejected. Please contact support.");
           }
         } catch (e) {
           console.log("Status check...");
         }
-      }, 5000); // Checks every 5 seconds
+      }, 5000);
     }
 
     // 4. Persistence: Auto-track on page load
@@ -1351,6 +1361,21 @@ Thank you for shopping with us.
       if (activeUTR) {
         document.getElementById("pendingBanner").style.display = "block";
         document.getElementById("bannerUTR").innerText = activeUTR;
+      }
+    }
+
+    function reopenWaitingStatus() {
+      // 1. Make sure the main checkout container is visible
+      const box = document.getElementById("checkoutBox");
+      if (box) box.style.display = "block";
+
+      // 2. Show the specific verification screen
+      showStep('waitingStep');
+
+      // 3. Ensure the UTR text is still there
+      const savedUTR = localStorage.getItem("pendingUTR");
+      if (savedUTR) {
+        document.getElementById("displayUTR").innerText = savedUTR;
       }
     }
 
