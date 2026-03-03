@@ -700,9 +700,12 @@
 <body>
 
   <div id="pendingBanner"
-    style="display:none; background: #4b2e1e; color: white; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
-    Checking Payment (UTR: <span id="bannerUTR"></span>)...
-    <button onclick="showStep('waitingStep')" style="margin-left:10px; cursor:pointer;">View Status</button>
+    style="display:none; background:#f5f5f5; border-bottom:1px solid #4b2e1e; padding:10px; text-align:center; position:sticky; top:0; z-index:1000;">
+    <span>Your payment (UTR: <strong id="bannerUTR"></strong>) is being verified.</span>
+    <button onclick="showStep('waitingStep')"
+      style="margin-left:15px; text-decoration:underline; background:none; border:none; color:#4b2e1e; cursor:pointer;">
+      Check Status
+    </button>
   </div>
 
   <div id="overlay" onclick="toggleMenu()"></div>
@@ -800,12 +803,19 @@
       <a href="#" onclick="showStep(1)" class="back-btn">← Back to Details</a>
     </div>
 
-    <div class="step" id="waitingStep">
+    <div class="step" id="waitingStep" style="display:none; text-align:center;">
       <div class="loader"></div>
       <h2>Verifying Payment...</h2>
       <p>Our team is verifying your UTR: <strong id="displayUTR"></strong></p>
-      <p style="font-size: 13px; color: #666;">This usually takes 2-5 minutes. Please do not refresh this page.</p>
-      <div id="adminStatus" style="margin-top: 20px; font-weight: bold; color: #4b2e1e;">Status: Pending</div>
+      <p style="font-size: 13px; color: #666;">This usually takes 2-5 minutes.</p>
+      <div id="adminStatus" style="margin: 20px 0; font-weight: bold; color: #4b2e1e;">Status: Pending</div>
+
+      <button onclick="goBackToShop()"
+        style="background: #4b2e1e; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-family: inherit;">
+        Continue Shopping
+      </button>
+
+      <p style="font-size: 11px; color: #999; margin-top: 10px;">We'll notify you here once approved!</p>
     </div>
 
 
@@ -1328,6 +1338,19 @@ Thank you for shopping with us.
         document.getElementById("step" + n).style.display = "block";
       } else {
         document.getElementById(n).style.display = "block";
+      }
+    }
+
+
+    function goBackToShop() {
+      // 1. Hide the checkout box
+      document.getElementById("checkoutBox").style.display = "none";
+
+      // 2. Show the "Pending Banner" at the top of the main page (if you added it)
+      const activeUTR = localStorage.getItem("pendingUTR");
+      if (activeUTR) {
+        document.getElementById("pendingBanner").style.display = "block";
+        document.getElementById("bannerUTR").innerText = activeUTR;
       }
     }
 
