@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,286 +16,104 @@
             --border-color: #dee2e6;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-light);
-            color: var(--text-dark);
-            display: flex;
-            min-height: 100vh;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; min-height: 100vh; }
 
         /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #fff;
-            border-right: 1px solid var(--border-color);
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-        }
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border-color); padding: 25px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+        .sidebar h2 { color: var(--primary-blue); margin-bottom: 40px; font-size: 22px; font-weight: 700; }
+        .nav-links a { display: block; padding: 12px 15px; color: #555; text-decoration: none; border-radius: 8px; margin-bottom: 8px; font-weight: 500; transition: 0.3s; cursor: pointer; }
+        .nav-links a.active { background: #e7f1ff; color: var(--primary-blue); }
+        .nav-links a:hover:not(.active) { background: #f8f9fa; }
 
-        .sidebar h2 {
-            color: var(--primary-blue);
-            margin-bottom: 40px;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-links a {
-            display: block;
-            padding: 12px 15px;
-            color: #555;
-            text-decoration: none;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .nav-links a.active {
-            background: #e7f1ff;
-            color: var(--primary-blue);
-        }
-
-        .nav-links a:hover:not(.active) {
-            background: #f8f9fa;
-        }
-
-        /* Main Content Area */
-        .main-container {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 40px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-        }
+        /* Main Content */
+        .main-container { flex: 1; margin-left: var(--sidebar-width); padding: 40px; width: calc(100% - var(--sidebar-width)); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .header h1 { font-size: 24px; font-weight: 700; }
 
         /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid var(--border-color); }
+        .stat-card span { font-size: 13px; color: #666; text-transform: uppercase; font-weight: 600; }
+        .stat-card h3 { font-size: 28px; margin-top: 5px; color: #222; }
 
-        .stat-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            border: 1px solid var(--border-color);
-        }
+        /* Table */
+        .table-container { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 18px 15px; text-align: left; font-size: 13px; color: #666; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+        td { padding: 18px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
 
-        .stat-card span {
-            font-size: 13px;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .stat-card h3 {
-            font-size: 28px;
-            margin-top: 5px;
-            color: #222;
-        }
-
-        .stat-card.active-stat {
-            border-top: 4px solid var(--success-green);
-        }
-
-        /* Table Container */
-        .table-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #f8f9fa;
-            padding: 18px 15px;
-            text-align: left;
-            font-size: 13px;
-            color: #666;
-            border-bottom: 1px solid var(--border-color);
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 18px 15px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #fff3cd;
-            color: #856404;
-            display: inline-block;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        .btn-approve {
-            background: var(--success-green);
-            color: white;
-            margin-right: 8px;
-        }
-
-        .btn-approve:hover {
-            background: #218838;
-        }
-
-        .btn-reject {
-            background: var(--danger-red);
-            color: white;
-        }
-
-        .btn-reject:hover {
-            background: #c82333;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-                padding: 15px;
-            }
-
-            .sidebar h2,
-            .nav-links span {
-                display: none;
-            }
-
-            .main-container {
-                margin-left: 80px;
-            }
-        }
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
+        .btn-approve { background: var(--success-green); color: white; margin-right: 8px; }
+        .btn-reject { background: var(--danger-red); color: white; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #fff3cd; color: #856404; }
     </style>
 </head>
 
 <body>
-
     <aside class="sidebar">
         <h2>Metro Admin</h2>
         <nav class="nav-links">
-            <a href="#" class="active"><span>Dashboard</span></a>
-            <a href="#"><span>Orders</span></a>
-            <a href="#"><span>Inventory</span></a>
-            <a href="#"><span>Settings</span></a>
+            <a onclick="showView('pending')" id="link-pending" class="active">Dashboard</a>
+            <a onclick="showView('history')" id="link-history">Order History</a>
+            <a onclick="exportToCSV()">Export CSV</a>
         </nav>
     </aside>
 
     <main class="main-container">
         <div class="header">
-            <h1>Trader Panel</h1>
-            <div style="font-size: 14px; color: #666;">Admin: Dibakar Das</div>
-            <div class="header">
-                <h1>Trader Panel</h1>
-                <div>
-                    <button class="btn" style="background: #6c757d; color: white;" onclick="exportToCSV()">
-                        📥 Export to CSV
-                    </button>
-                    <span style="font-size: 14px; color: #666; margin-left: 15px;">Admin: Joy Paul</span>
+            <h1 id="view-title">Trader Panel</h1>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="btn" style="background: #6c757d; color: white;" onclick="exportToCSV()">📥 Export to CSV</button>
+                <div style="font-size: 14px; color: #666;">Admin: <strong>Dibakar Das</strong></div>
+            </div>
+        </div>
+
+        <div id="pending-view">
+            <div class="stats-grid">
+                <div class="stat-card"><span>Total Requisites</span><h3>11</h3></div>
+                <div class="stat-card" style="border-top: 4px solid var(--success-green);">
+                    <span>Pending Payments</span><h3 id="pendingCount">0</h3>
                 </div>
+                <div class="stat-card"><span>Daily Limit</span><h3>₹1,00,000</h3></div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Customer</th><th>UTR Number</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="list"></tbody>
+                </table>
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span>Total Requisites</span>
-                <h3>11</h3>
+        <div id="history-view" style="display: none;">
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Customer</th><th>UTR</th><th>Amount</th><th>Processed At</th><th>Final Status</th></tr></thead>
+                    <tbody id="historyList"></tbody>
+                </table>
             </div>
-            <div class="stat-card active-stat">
-                <span>Pending Payments</span>
-                <h3 id="pendingCount">0</h3>
-            </div>
-            <div class="stat-card">
-                <span>Total Daily Limit</span>
-                <h3>₹1,00,000</h3>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer Details</th>
-                        <th>UTR Number</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="list">
-                </tbody>
-            </table>
         </div>
     </main>
 
     <script>
-        // Fetch and display orders
+        // Load Pending Orders
         async function loadOrders() {
             try {
                 const res = await fetch('https://metroclothenterprise.onrender.com/api/admin/pending');
-                if (!res.ok) throw new Error("Failed to fetch orders");
-
                 const orders = await res.json();
                 document.getElementById('pendingCount').innerText = orders.length;
-
                 const container = document.getElementById('list');
 
                 if (orders.length === 0) {
-                    container.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:40px; color:#888;'>No pending payments at the moment.</td></tr>";
+                    container.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:40px; color:#888;'>No pending payments.</td></tr>";
                     return;
                 }
 
                 container.innerHTML = orders.map(o => `
                     <tr>
-                        <td>
-                            <div style="font-weight: 600;">${o.customer}</div>
-                            <div style="font-size: 12px; color: #888;">${o.phone}</div>
-                        </td>
-                        <td><code style="background: #f1f1f1; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${o.utr}</code></td>
-                        <td style="font-weight: 600;">₹${o.amount}</td>
+                        <td><strong>${o.customer}</strong><br><small>${o.phone}</small></td>
+                        <td><code style="background:#f1f1f1; padding:4px; border-radius:4px;">${o.utr}</code></td>
+                        <td>₹${o.amount}</td>
                         <td><span class="status-badge">Inactive</span></td>
                         <td>
                             <button class="btn btn-approve" onclick="approve('${o.utr}')">Approve</button>
@@ -304,104 +121,79 @@
                         </td>
                     </tr>
                 `).join('');
-            } catch (err) {
-                console.error("Admin Load Error:", err);
-            }
+            } catch (err) { console.error(err); }
+        }
+
+        // View Toggling
+        function showView(view) {
+            document.getElementById('pending-view').style.display = (view === 'pending') ? 'block' : 'none';
+            document.getElementById('history-view').style.display = (view === 'history') ? 'block' : 'none';
+            document.getElementById('view-title').innerText = (view === 'pending') ? 'Trader Panel' : 'Processed History';
+            document.getElementById('link-pending').className = (view === 'pending') ? 'active' : '';
+            document.getElementById('link-history').className = (view === 'history') ? 'active' : '';
+            if(view === 'history') renderHistory();
         }
 
         async function approve(utr) {
             try {
-                // 1. Find the order details from the current UI before approving
                 const resPending = await fetch('https://metroclothenterprise.onrender.com/api/admin/pending');
-                const pendingOrders = await resPending.json();
-                const orderToSave = pendingOrders.find(o => o.utr === utr);
+                const orders = await resPending.json();
+                const orderData = orders.find(o => o.utr === utr);
 
-                const response = await fetch('https://metroclothenterprise.onrender.com/api/admin/approve', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                const res = await fetch('https://metroclothenterprise.onrender.com/api/admin/approve', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ utr })
                 });
 
-                if (response.ok) {
-                    // 2. Save to Local History
-                    let history = JSON.parse(localStorage.getItem("adminOrderHistory") || "[]");
-                    history.push({
-                        ...orderToSave,
-                        processedAt: new Date().toLocaleString(),
-                        finalStatus: 'Approved'
-                    });
-                    localStorage.setItem("adminOrderHistory", JSON.stringify(history));
-
-                    alert("Payment Approved! Order moved to History.");
+                if (res.ok) {
+                    let history = JSON.parse(localStorage.getItem("adminHistory") || "[]");
+                    history.push({ ...orderData, processedAt: new Date().toLocaleString(), finalStatus: 'Approved' });
+                    localStorage.setItem("adminHistory", JSON.stringify(history));
+                    alert("Approved!");
                     loadOrders();
                 }
-            } catch (err) {
-                console.error("Approve Error:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // Reject order logic
         async function rejectOrder(utr) {
-            if (!confirm("Are you sure you want to reject this payment?")) return;
-
+            if (!confirm("Reject this payment?")) return;
             try {
-                const response = await fetch('https://metroclothenterprise.onrender.com/api/admin/reject', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                const res = await fetch('https://metroclothenterprise.onrender.com/api/admin/reject', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ utr })
                 });
-
-                if (response.ok) {
-                    alert("Order Rejected.");
-                    loadOrders();
-                }
-            } catch (err) {
-                console.error("Reject Error:", err);
-            }
+                if (res.ok) { alert("Rejected!"); loadOrders(); }
+            } catch (err) { console.error(err); }
         }
 
-        // Refresh every 10 seconds
-        setInterval(loadOrders, 10000);
-        loadOrders();
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem("adminHistory") || "[]");
+            document.getElementById('historyList').innerHTML = history.reverse().map(o => `
+                <tr>
+                    <td>${o.customer}</td>
+                    <td><code>${o.utr}</code></td>
+                    <td>₹${o.amount}</td>
+                    <td>${o.processedAt}</td>
+                    <td style="color:green; font-weight:bold;">${o.finalStatus}</td>
+                </tr>
+            `).join('') || "<tr><td colspan='5' style='text-align:center; padding:20px;'>No history yet.</td></tr>";
+        }
 
         function exportToCSV() {
-            // 1. Get the current list of orders (ensure loadOrders has run)
-            const table = document.getElementById("list");
-            const rows = table.querySelectorAll("tr");
-
-            if (rows.length === 0 || rows[0].innerText.includes("No pending payments")) {
-                alert("No orders to export!");
-                return;
-            }
-
-            // 2. Define CSV Headers
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Customer,Phone,UTR,Amount,Status\n";
-
-            // 3. Loop through orders and format them
-            // Note: We access the global 'orders' variable if available, 
-            // or scrape the table rows.
-            rows.forEach(row => {
-                const cols = row.querySelectorAll("td");
-                const customer = cols[0].innerText.replace(/\n/g, " ");
-                const utr = cols[1].innerText;
-                const amount = cols[2].innerText.replace("₹", "");
-                const status = cols[3].innerText;
-
-                csvContent += `"${customer}","${utr}","${amount}","${status}"\n`;
-            });
-
-            // 4. Create a hidden link and "click" it to download
-            const encodedUri = encodeURI(csvContent);
+            const history = JSON.parse(localStorage.getItem("adminHistory") || "[]");
+            if(history.length === 0) return alert("Nothing to export!");
+            let csv = "data:text/csv;charset=utf-8,Customer,Phone,UTR,Amount,Date,Status\n";
+            history.forEach(o => { csv += `"${o.customer}","${o.phone}","${o.utr}","${o.amount}","${o.processedAt}","${o.finalStatus}"\n`; });
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Metro_Orders_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", "Metro_History.csv");
             document.body.appendChild(link);
-
             link.click();
             document.body.removeChild(link);
         }
+
+        setInterval(loadOrders, 10000);
+        loadOrders();
     </script>
 </body>
-
 </html>
