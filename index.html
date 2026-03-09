@@ -919,12 +919,13 @@
       <div
         style="background: #f9f4f0; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-size: 14px;">
         <p><strong>Option 1: UPI (GPay/PhonePe/Paytm)</strong></p>
-        <p>UPI ID: <span style="color: #4b2e1e; font-weight: bold;">metrocloth@upi</span></p>
+        <p>UPI ID: <span id="displayUPI" style="color: #4b2e1e; font-weight: bold;">Loading...</span></p>
         <button onclick="redirectToUPI()" style="background:#28a745; margin-bottom: 10px;">Open UPI App</button>
 
         <p><strong>Option 2: Bank Transfer (IMPS)</strong></p>
-        <p>A/C: 123456789012 | IFSC: BARB0XXXXX</p>
-        <p>Name: Metro Cloth Enterprise</p>
+        <div id="displayBankDetails">
+          <p>Loading bank details...</p>
+        </div>
       </div>
 
       <div style="margin-top: 20px;">
@@ -1456,13 +1457,35 @@
       }
     }
 
+    // Function to fetch and display live payment settings
     async function loadPaymentDetails() {
-      const res = await fetch('https://metroclothenterprise.onrender.com/api/payment-details');
-      const data = await res.json();
+      try {
+        const res = await fetch('https://metroclothenterprise.onrender.com/api/payment-details');
+        const data = await res.json();
 
-      // Update your payment UI with these values
-      document.getElementById('displayUPI').innerText = data.upiId;
-      document.getElementById('displayBank').innerText = `${data.bankName} - ${data.accountNumber}`;
+        // 1. Update UPI ID
+        document.getElementById('displayUPI').innerText = data.upiId;
+
+        // 2. Update Bank Details Block
+        document.getElementById('displayBankDetails').innerHTML = `
+            <p><strong>Bank:</strong> ${data.bankName}</p>
+            <p><strong>A/C:</strong> ${data.accountNumber} | <strong>IFSC:</strong> ${data.ifsc}</p>
+            <p><strong>Name:</strong> ${data.accountHolder}</p>
+        `;
+
+        // 3. Update the global variable for the "Open UPI App" button
+        window.currentUPI = data.upiId;
+      } catch (err) {
+        console.error("Failed to load payment details:", err);
+      }
+    }
+
+    // 4. Update the redirection function to use the dynamic ID
+    function redirectToUPI() {
+      const amount = document.getElementById('totalPay').innerText;
+      const upi = window.currentUPI || "joypaul727856@okaxis"; // Fallback
+      const upiUrl = `upi://pay?pa=${upi}&pn=Metro%20Cloth&am=${amount}&cu=INR`;
+      window.location.href = upiUrl;
     }
 
 
