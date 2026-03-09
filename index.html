@@ -1209,7 +1209,7 @@
 
     }
 
-    
+
     function downloadReceipt() {
       const orderId = document.getElementById("orderId").innerText;
       const deliveryDate = document.getElementById("delivery").innerText;
@@ -1454,6 +1454,15 @@
       if (savedUTR) {
         document.getElementById("displayUTR").innerText = savedUTR;
       }
+    }
+
+    async function loadPaymentDetails() {
+      const res = await fetch('https://metroclothenterprise.onrender.com/api/payment-details');
+      const data = await res.json();
+
+      // Update your payment UI with these values
+      document.getElementById('displayUPI').innerText = data.upiId;
+      document.getElementById('displayBank').innerText = `${data.bankName} - ${data.accountNumber}`;
     }
 
 

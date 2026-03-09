@@ -32,16 +32,16 @@ const transporter = nodemailer.createTransport({
 
 app.post('/api/orders', (req, res) => {
     const { utr, amount, customer, phone, items } = req.body;
-    
+
     // 1. Log exactly what the server received
     console.log(`📥 NEW ORDER RECEIVED: UTR ${utr} from ${customer}`);
 
-    const newOrder = { 
-        utr, amount, customer, phone, items, 
-        status: 'pending', 
-        id: "MC" + Math.floor(Math.random() * 900000) 
+    const newOrder = {
+        utr, amount, customer, phone, items,
+        status: 'pending',
+        id: "MC" + Math.floor(Math.random() * 900000)
     };
-    
+
     orders.push(newOrder);
 
     // 2. Setup the Email
@@ -135,4 +135,25 @@ app.get('/debug-email', (req, res) => {
             res.send("Success! Check your inbox (and Spam folder).");
         }
     });
+});
+
+// Variable to store dynamic payment details
+let paymentDetails = {
+    upiId: "123456@okaxis",
+    bankName: "Axis Bank",
+    accountHolder: "your name",
+    accountNumber: "1234567890",
+    ifsc: "UTIB0001234"
+};
+
+// Route to get payment details
+app.get('/api/payment-details', (req, res) => {
+    res.json(paymentDetails);
+});
+
+// Route to update payment details
+app.post('/api/admin/update-payment', (req, res) => {
+    paymentDetails = req.body;
+    console.log("✅ Payment details updated:", paymentDetails);
+    res.json({ message: "Settings updated successfully" });
 });
