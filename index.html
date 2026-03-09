@@ -1421,11 +1421,19 @@
 
     // 5. Helper to switch UI steps
     function showStep(n) {
+      // 1. Hide all steps first
       document.querySelectorAll(".step").forEach(s => s.style.display = "none");
+
+      // 2. Show the requested step
       if (typeof n === 'number') {
         document.getElementById("step" + n).style.display = "block";
       } else {
         document.getElementById(n).style.display = "block";
+      }
+
+      // 3. NEW: Fetch live payment details if user is on the payment step
+      if (n === 2 || n === 'step2') {
+        loadPaymentDetails(); // This removes the "Loading..." text
       }
     }
 
@@ -1488,7 +1496,7 @@
       window.location.href = upiUrl;
     }
 
-
+    loadPaymentDetails();
 
   </script>
 
